@@ -8,7 +8,7 @@ function TaskList(){
 
     const addTask = () => {
         const newTask = { id: Date.now(),text:input,completed:false};
-        setTasks([...tasks.newTask]);
+        setTasks([...tasks,newTask]);
         setInput('');
     };
 
