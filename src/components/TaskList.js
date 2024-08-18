@@ -22,13 +22,12 @@ function TaskList({setIsActive,setActiveTask}){
     }, [tasks]);
 
     const addTask = () => {
-        if(input.trim() === ''){
-            alert('Please enter a task.');
+        if (input.trim() === '') {
+            setErrorMessage('Please enter a task.');
             return;
         }
-
-        const newTask = { id: Date.now(),text:input,completed:false,timeSpent: 0};
-        setTasks(prevTasks => [...tasks,newTask]);
+        const newTask = { id: Date.now(), text: input, completed: false, timeSpent: 0 };
+        setTasks(prevTasks => [...prevTasks, newTask]);
         setInput('');
         setErrorMessage('');
     };
