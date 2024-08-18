@@ -5,9 +5,10 @@ import { getDefaultNormalizer } from "@testing-library/react";
 function TaskList(){
     const [tasks,setTasks] = useState([]);
     const [input,setInput] = useState('');
+    const [activeTaskId,setActiveTaskId] = useState(null);
 
     const addTask = () => {
-        const newTask = { id: Date.now(),text:input,completed:false};
+        const newTask = { id: Date.now(),text:input,completed:false,timeSpent: 0};
         setTasks([...tasks,newTask]);
         setInput('');
     };
@@ -25,7 +26,13 @@ function TaskList(){
             <input value={input} onChange={(e) => setInput(e.target.value)} />
             <button onClick={addTask}>タスク追加</button>
             {tasks.map(task => (
-                <Task key={task.id} task={task} onDelete={deleteTask} onToggle={toggleTask}/>
+                <Task 
+                    key={task.id} 
+                    task={task} 
+                    onDelete={deleteTask} 
+                    onToggle={toggleTask}
+                    setActiveTaskId={setActiveTaskId}
+                />
             ))}
         </div>
     );

@@ -1,7 +1,6 @@
 import React from "react";
-import TaskList from "./TaskList";
 
-function Task({task,onDelete,onToggle}){
+function Task({task,onDelete,onToggle,setActiveTaskId}){
     return(
         <div>
             <h3>
@@ -9,6 +8,9 @@ function Task({task,onDelete,onToggle}){
                 <button onClick={() => onDelete(task.id)}>削除</button>
                 <button onClick={() => onToggle(task.id)}>完了</button>
             </h3>
+            <div onClick={() => setActiveTaskId(task.id)}>
+                {task.text} - {task.timeSpent}秒
+            </div>
         </div>
     );
 }
