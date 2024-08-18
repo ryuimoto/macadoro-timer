@@ -14,11 +14,8 @@ function Task({task,onDelete,onToggle,setActiveTaskId,onPomodoroSet}){
                     console.log('onPomodoroSet is not a function',onPomodoroSet);
                    }
                 }}>ポモドーロにセット</button>
+                　{Math.floor(task.timeSpent)} 分
             </h3>
-            <div onClick={() => setActiveTaskId(task.id)}>
-                {task.text} - {task.timeSpent}秒
-            </div>
-        
         </div>
     );
 }

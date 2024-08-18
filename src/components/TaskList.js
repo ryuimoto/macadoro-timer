@@ -6,11 +6,18 @@ function TaskList({setIsActive,setActiveTask}){
     const [tasks,setTasks] = useState([]);
     const [input,setInput] = useState('');
     const [activeTaskId,setActiveTaskId] = useState(null);
+    const [errorMessage,setErrorMessage] = useState('');
 
     const addTask = () => {
+        if(input.trim() === ''){
+            console.log('Empty input, no task added');
+            return;
+        }
+
         const newTask = { id: Date.now(),text:input,completed:false,timeSpent: 0};
         setTasks([...tasks,newTask]);
         setInput('');
+        setErrorMessage('');
     };
 
     const deleteTask = id => {
@@ -31,6 +38,7 @@ function TaskList({setIsActive,setActiveTask}){
         <div>
             <input value={input} onChange={(e) => setInput(e.target.value)} />
             <button onClick={addTask}>タスク追加</button>
+            {errorMessage && <div style={{color:'red'}}>{errorMessage}</div>}
             {tasks.map(task => (
                 <Task 
                 key={task.id} 
