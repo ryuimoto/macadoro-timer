@@ -1,10 +1,20 @@
 import React, { useState, useEffect } from "react";
+import CircularProgress from "./CircularProgress";
 
 function PomodoroTimer({ activeTask }) {
-    const [secondsLeft, setSecondsLeft] = useState(() => 
-        Number(localStorage.getItem('secondsLeft')) || 25 * 60);
-    const [isActive, setIsActive] = useState(() => 
-        localStorage.getItem('isActive') === 'true');
+    const totalSeconds = 25 * 60;
+
+    const [secondsLeft, setSecondsLeft] = useState(() => {
+        const savedSeconds = localStorage.getItem('secondsLeft');
+        return savedSeconds !== null && !isNaN(savedSeconds) ? Number(savedSeconds) : 25 * 60;
+    });
+
+    const [progress,setProgress] = useState((secondsLeft / totalSeconds) * 100);
+   
+    const [isActive, setIsActive] = useState(() => {
+        const savedIsActive = localStorage.getItem('isActive');
+        return savedIsActive ? savedIsActive === 'true' : false;
+    });
     const [isPaused, setIsPaused] = useState(() => 
         localStorage.getItem('isPaused') === 'true');
     const [isWorking, setIsWorking] = useState(() => 
@@ -16,7 +26,7 @@ function PomodoroTimer({ activeTask }) {
         const interval = setInterval(() => {
             if (isActive && !isPaused) {
                 if (secondsLeft > 0) {
-                    setSecondsLeft(secondsLeft - 1);
+                    setSecondsLeft(prev => prev -1);
                     localStorage.setItem('secondsLeft', secondsLeft - 1);
                 } else {
                     setIsActive(false);
@@ -42,6 +52,10 @@ function PomodoroTimer({ activeTask }) {
         localStorage.setItem('pomodoroCount', pomodoroCount);
         localStorage.setItem('secondsLeft', secondsLeft);
     }, [isActive, isPaused, isWorking, pomodoroCount, secondsLeft]);
+
+    useEffect(() => {
+        setProgress((secondsLeft / totalSeconds) * 100);
+    },[secondsLeft]);
 
     const handleStart = () => {
         setIsActive(true);
@@ -77,9 +91,17 @@ function PomodoroTimer({ activeTask }) {
 
     return (
         <div style={{ backgroundColor: isWorking ? 'red' : 'lightblue' }}>
-            <h2>Time left: {formatTime()}</h2>
+             <br/>
+             <CircularProgress 
+                size={300}
+                progress={progress}
+                strokeWidth={10}
+                circleOneStroke="#eee"
+                circleTwoStroke="#ffffff" // 色を変更して視認性を向上
+                timeLeft={formatTime(secondsLeft)}
+                activeTask={activeTask}
+            />
             <h3>Pomodoro Count: {pomodoroCount}</h3>
-            {activeTask && <h3>{activeTask.text} を実行中</h3>}
             {!isActive ? (
                 <button onClick={handleStart}>スタート</button>
             ) : (
