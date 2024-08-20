@@ -1,20 +1,29 @@
 import React, { useState, useEffect } from "react";
-import CircularProgress from "./CircularProgress";
+import CircularProgressWithLabel from "./CircularProgressWithLabel";
+import Typography from '@mui/material/Typography';
+import Box from "@mui/material/Box";
+import { Button } from "@mui/material";
 
 function PomodoroTimer({ activeTask }) {
     const totalSeconds = 25 * 60;
+    const audio = new Audio('');
 
     const [secondsLeft, setSecondsLeft] = useState(() => {
         const savedSeconds = localStorage.getItem('secondsLeft');
         return savedSeconds !== null && !isNaN(savedSeconds) ? Number(savedSeconds) : 25 * 60;
     });
 
-    const [progress,setProgress] = useState((secondsLeft / totalSeconds) * 100);
-   
+    const [progress, setProgress] = useState((secondsLeft / totalSeconds) * 100);
+
+    useEffect(() => {
+        setProgress((secondsLeft / totalSeconds) * 100);
+    }, [secondsLeft]);
+
     const [isActive, setIsActive] = useState(() => {
         const savedIsActive = localStorage.getItem('isActive');
         return savedIsActive ? savedIsActive === 'true' : false;
     });
+
     const [isPaused, setIsPaused] = useState(() => 
         localStorage.getItem('isPaused') === 'true');
     const [isWorking, setIsWorking] = useState(() => 
@@ -22,23 +31,28 @@ function PomodoroTimer({ activeTask }) {
     const [pomodoroCount, setPomodoroCount] = useState(() => 
         Number(localStorage.getItem('pomodoroCount')) || 0);
 
+   
+
     useEffect(() => {
         const interval = setInterval(() => {
             if (isActive && !isPaused) {
-                if (secondsLeft > 0) {
-                    setSecondsLeft(prev => prev -1);
-                    localStorage.setItem('secondsLeft', secondsLeft - 1);
-                } else {
-                    setIsActive(false);
-                    setIsWorking(!isWorking);
-                    setSecondsLeft(isWorking ? 5 * 60 : 25 * 60);
-                    localStorage.setItem('isActive', false);
-                    localStorage.setItem('isWorking', !isWorking);
-                    if (isWorking) {
-                        setPomodoroCount(pomodoroCount + 1);
-                        localStorage.setItem('pomodoroCount', pomodoroCount + 1);
+                setSecondsLeft(prevSeconds => {
+                    if(prevSeconds > 0){
+                        localStorage.getItem('secondsLeft',prevSeconds - 1);
+                        return prevSeconds - 1;
+                    }else{
+                        setIsActive(false);
+                        setIsWorking(!isWorking);
+                        const newSeconds = isWorking ? 5 * 60 : 25 * 60;
+                        localStorage.setItem('isActive',false);
+                        localStorage.setItem('isWorking',!isWorking);
+                        if(isWorking){
+                            setPomodoroCount(pomodoroCount + 1);
+                            localStorage.setItem('pomodoroCount',pomodoroCount + 1);
+                        }
+                        return newSeconds;
                     }
-                }
+                });
             }
         }, 1000);
 
@@ -55,7 +69,7 @@ function PomodoroTimer({ activeTask }) {
 
     useEffect(() => {
         setProgress((secondsLeft / totalSeconds) * 100);
-    },[secondsLeft]);
+    },[secondsLeft,totalSeconds]);
 
     const handleStart = () => {
         setIsActive(true);
@@ -89,34 +103,25 @@ function PomodoroTimer({ activeTask }) {
         return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     };
 
+    const timeLeft = formatTime();
+
     return (
-        <div style={{ backgroundColor: isWorking ? 'red' : 'lightblue' }}>
-             <br/>
-             <CircularProgress 
-                size={300}
-                progress={progress}
-                strokeWidth={10}
-                circleOneStroke="#eee"
-                circleTwoStroke="#ffffff" // 色を変更して視認性を向上
-                timeLeft={formatTime(secondsLeft)}
-                activeTask={activeTask}
-            />
+        <Box 
+            style={{ 
+                padding: 20,
+                backgroundColor: isActive && isWorking ? 'red' : 'transparent'
+            }}
+        >
+            <CircularProgressWithLabel value={progress} label={timeLeft} size={200} />
+            <Typography variant="h6" align="center">
+                {activeTask ? `${activeTask.text}を作業中` : "タスクなし"}
+            </Typography>
             <h3>Pomodoro Count: {pomodoroCount}</h3>
-            {!isActive ? (
-                <button onClick={handleStart}>スタート</button>
-            ) : (
-                <>
-                    {isPaused ? (
-                        <>
-                            <button onClick={handleContinue}>続ける</button>
-                            <button onClick={handleStop}>終了</button>
-                        </>
-                    ) : (
-                        <button onClick={handlePause}>一時停止</button>
-                    )}
-                </>
-            )}
-        </div>
+            <Button variant="contained" color="primary" onClick={handleStart}>Start</Button>
+            <Button variant="contained" color="secondary" onClick={handlePause} disabled={!isActive}>Pause</Button>
+            <Button variant="contained" color="success" onClick={handleContinue} disabled={!isPaused}>Continue</Button>
+            <Button variant="contained" color="error" onClick={handleStop} disabled={!isActive}>Stop</Button>
+        </Box>
     );
 }
 

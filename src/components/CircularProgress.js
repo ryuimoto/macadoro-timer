@@ -1,4 +1,7 @@
 import React from "react";
+import { CircularProgress as MuiCircularProgress } from "@mui/material"; // 名前を変更してインポート
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
 
 const CircularProgress = ({size,progress,strokeWidth,circleOneStroke,circleTwoStroke,children,timeLeft,activeTask}) => {
     const center = size / 2;
@@ -51,7 +54,9 @@ const CircularProgress = ({size,progress,strokeWidth,circleOneStroke,circleTwoSt
             </text>
           )}
         </svg>
+      
       );
+    
 };
 
 export default CircularProgress;
