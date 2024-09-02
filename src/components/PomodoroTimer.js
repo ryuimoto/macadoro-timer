@@ -6,7 +6,7 @@ import { Button } from "@mui/material";
 
 function PomodoroTimer({ activeTask }) {
     const totalSeconds = 25 * 60;
-    const audio = new Audio('');
+    const audio = new Audio('public/audio/alert.mp3');
 
     const [secondsLeft, setSecondsLeft] = useState(() => {
         const savedSeconds = localStorage.getItem('secondsLeft');
@@ -31,26 +31,20 @@ function PomodoroTimer({ activeTask }) {
     const [pomodoroCount, setPomodoroCount] = useState(() => 
         Number(localStorage.getItem('pomodoroCount')) || 0);
 
-   
-
     useEffect(() => {
         const interval = setInterval(() => {
             if (isActive && !isPaused) {
                 setSecondsLeft(prevSeconds => {
                     if(prevSeconds > 0){
-                        localStorage.getItem('secondsLeft',prevSeconds - 1);
                         return prevSeconds - 1;
                     }else{
                         setIsActive(false);
                         setIsWorking(!isWorking);
-                        const newSeconds = isWorking ? 5 * 60 : 25 * 60;
-                        localStorage.setItem('isActive',false);
-                        localStorage.setItem('isWorking',!isWorking);
                         if(isWorking){
                             setPomodoroCount(pomodoroCount + 1);
-                            localStorage.setItem('pomodoroCount',pomodoroCount + 1);
+                            audio.play();
                         }
-                        return newSeconds;
+                        return isWorking ? 5 * 60 : 25 * 60;
                     }
                 });
             }
@@ -109,7 +103,6 @@ function PomodoroTimer({ activeTask }) {
         <Box 
             style={{ 
                 padding: 20,
-                backgroundColor: isActive && isWorking ? 'red' : 'transparent'
             }}
         >
             <CircularProgressWithLabel value={progress} label={timeLeft} size={200} />
